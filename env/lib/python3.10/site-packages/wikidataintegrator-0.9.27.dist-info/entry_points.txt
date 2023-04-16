@@ -1,0 +1,2 @@
+[console_scripts]
+wikidataintegrator-publication = wikidataintegrator.wdi_helpers.publication:main
