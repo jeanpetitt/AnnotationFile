@@ -12,10 +12,18 @@ def openUrl(query):
       "search": query
 
     }
+
+  # if query.split("-"):
+	# 	query = query.split("-")
+	# 	longest_word = max(query, key=len)
+	# 	query = longest_word
+	# 	print(query)
+
     uri = ""
     try:
       data = requests.get(url, params=params)
       uri = data.json()["search"][0]["id"]
+      print(uri)
     except:
       uri = "aucun resultat"
     return uri
