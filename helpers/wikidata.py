@@ -4,7 +4,9 @@ import csv,os, re, pandas as pd, numpy as np
 from openapi import get_uri_cpa
 
 path = f"{os.getcwd()}/dataset" 
-
+"""
+=============== wikida annotation=========================
+"""
 # get urls of wikidata of cea and cta
 def openUrL(query):
 	url = "https://www.wikidata.org/w/api.php"
@@ -63,7 +65,7 @@ def  openFilecsvCea(files_cea):
 				# parcourit chaque cellule de chaque colonne en effectuant la recherche sur
 				# wikidata
 				list_uri = []
-				cells_firs_line = [cell.format() for cell in _file.loc[0]]
+				cells_firs_line = [cell for cell in _file.loc[0]]
 				print(cells_firs_line)
 				
 				for cols in _file.columns:
@@ -93,7 +95,7 @@ def  openFilecsvCea(files_cea):
 							list_uri.append("NIL")
 				print(len(list_uri))
 				# get name of cleaned file
-				filename = filed.split("_clean.")[0]
+				filename = filed.split("clean.")[0]
 				print("fichier:", filename, "nbre de ligne: ", total_rows, " nombre de col: ", total_cols)
 				filetotalrowcol = total_rows * total_cols
 				row = 0
@@ -121,7 +123,7 @@ def  openFilecsvCea(files_cea):
 				
 		csv_file.close()
 
-	# read output cea, cta, cpa csv file
+	# read output cea csv file
 	print("============cea=============")
 	_test_cea = pd.read_csv(files_cea)
 	data_cea =_test_cea.loc[0:]
@@ -150,28 +152,35 @@ def openFilecsvCta(files_cta):
 				# open current clean file in dataset with pandas dataframe
 				_file = pd.read_csv(f"{path}/{filed}", header=None)
 				# get cell header of each column
-				cells_firs_line = [cell.format() for cell in _file.loc[0]]
+				cells_firs_line = [cell for cell in _file.loc[0]]
 				print(cells_firs_line)
 				# get total row and colums of each cleaned file csv
 				total_cols=len(_file.axes[1])
-				filename = filed.split("_clean.")[0]
+				filename = filed.split("clean.")[0]
 				print("fichier:", filename, " nombre de col: ", total_cols)
 
 				# format cell of header
 				# ici aussi je dois traiter les entetes
 				liste_header_uri = []
 				for cell in cells_firs_line:
-					cell = cell.split()[-1]
-					uri = openUrL(cell)
-					liste_header_uri.append(uri)
+					if (type(cell) == type(np.nan)):
+						liste_header_uri.append("NIL")
+					elif openUrL(cell) == "aucun resultat":
+						liste_header_uri.append("NIL")
+					else:
+						uri = openUrL(cell)
+						liste_header_uri.append(uri)
 					print(cell)
 
 				# creer la structure d'un fichier cta
 				col = 0
 				while col < total_cols:
 					# for cell in total_cols:
-					writer.writerow([filename, col, liste_header_uri[col]])
-					col += 1
+					if liste_header_uri[col] == "NIL":
+						col += 1
+					else:
+						writer.writerow([filename, col, liste_header_uri[col]])
+						col += 1
 				# end structure cta.csv
 
 		csv_file.close()
@@ -202,19 +211,22 @@ def openFilecsvCpa(files_cpa):
 				# open current clean file in dataset with pandas dataframe
 				_file = pd.read_csv(f"{path}/{filed}", header=None)
 				# get cell header
-				cells_firs_line = [cell.format() for cell in _file.loc[0]]
+				cells_firs_line = [cell for cell in _file.loc[0]]
 				"""
 					format  cell header to entity expression
 				"""
 				cells_firs_line_format = []
 				for cell in cells_firs_line:
-					cell = cell.split()[-1]
-					cells_firs_line_format.append(cell)
+					if (type(cell) == type(np.nan)):
+						cells_firs_line_format.append("aucresultat")
+					else:
+						cells_firs_line_format.append(cell)
 				# end format cell header
 
 				# get total colums of each cleaned file csv
 				total_cols=len(_file.axes[1])
-				filename = filed.split("_clean.")[0]
+				filename = filed.split("clean.")[0]
+				print("fichier:", filename, " nombre de col: ", total_cols)
 
 				# list couples header
 				result =[]
@@ -240,8 +252,11 @@ def openFilecsvCpa(files_cpa):
 				# write in cpa file
 				i = 0
 				for couple in couples:
-					writer.writerow([filename, couple[0], couple[1], list_uri[i]])
-					i += 1
+					if list_uri[i] == "aucun resultat":
+						i += 1
+					else:
+						writer.writerow([filename, couple[0], couple[1], list_uri[i]])
+						i += 1
 				# end structure cpa.csv
 
 		
@@ -263,9 +278,9 @@ def openFilecsvCpa(files_cpa):
 
 
 # execute function
-# openFilecsvCea("../test_cea.csv")
-# openFilecsvCta("../test_cta.csv")
-openFilecsvCpa("../test_cpa.csv")
+openFilecsvCea("../wikidata/cea.csv")
+openFilecsvCta("../wikidata/cta.csv")
+openFilecsvCpa("../wikidata/cpa.csv")
 
 # getUricpa("food", "feed")
 
