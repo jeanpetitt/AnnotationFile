@@ -2,4 +2,7 @@
 __pycache__
 
 env/
-test.py
+test*
+.env
+source_table_de
+clean*
