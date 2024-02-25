@@ -90,4 +90,35 @@ def annotateCea(path_folder):
     print(data_cea)
 
 
-annotateCea('clean_table_en/tables_WD')
+# annotateCea('clean_table_en/tables_WD')
+
+def get_cea(path_file):
+    file = pd.read_csv(path_file, header=None)
+
+    result = []
+    i = 0
+    for entity in file[3]:
+        query = entity.split("/")[-1]
+        label, description, uri = openUrl(query)
+        result.append([label, description, uri])
+        df = pd.DataFrame(result)
+        df.to_csv("cea_dataset.csv")
+
+
+get_cea("WikidataTables2023/DataSets/Valid/gt/cea_gt.csv")
+
+
+# def openFolder(folder):
+#     list_file = os.listdir(folder)
+#     print(len(list_file))
+#     cea = pd.read_csv(
+#         "WikidataTables2023/DataSets/Valid/gt/cea_gt.csv", header=None)
+#     cea_set = set()
+#     for f in cea[0]:
+#         cea_set.add(f)
+#     print(len(cea_set))
+#     # for file in list_file:
+#     #     print(file)
+
+
+# openFolder("WikidataTables2023/DataSets/Valid/tables")

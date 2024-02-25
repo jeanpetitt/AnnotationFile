@@ -111,7 +111,11 @@ def openUrl(query):
             response = requests.get(url, params=params)
             if response.json()["search"] != []:
                 uri = response.json()["search"][0]['concepturi']
-                print("String", uri)
+                label = response.json()["search"][0]['label'] if 'label' in response.json()[
+                    "search"][0] else ''
+                description = response.json()[
+                    "search"][0]['description'] if 'description' in response.json()["search"][0] else ""
+                print(label, "\n", uri, '\n', description)
             else:
                 uri = "No result"
                 print(uri)
@@ -163,7 +167,7 @@ def openUrl(query):
         except ValueError as e:
             print("Internet connection error")
 
-    return uri
+    return label, description, uri
 
 
-# openUrl("-")
+# openUrl("Q65944")
