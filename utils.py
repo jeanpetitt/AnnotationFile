@@ -4,6 +4,7 @@ import re
 import requests
 import pandas as pd
 import numpy as np
+import json
 from api import openUrl
 
 # wikidata cea annotation
@@ -101,8 +102,18 @@ def get_cea(path_file):
         query = entity.split("/")[-1]
         label, description, uri = openUrl(query)
         result.append([label, description, uri])
-        df = pd.DataFrame(result)
-        df.to_csv("cea_dataset.csv")
+        # df = pd.DataFrame(result)
+        # df.to_csv("cea_dataset.csv")
+
+    with open("semtab_dataset.jsonl", 'w') as file:
+        for data in result:
+            json.dump(
+                {
+                    "label": data[0],
+                    "description": data[1],
+                    "uri": data[2]
+                }, file
+            )
 
 
 get_cea("WikidataTables2023/DataSets/Valid/gt/cea_gt.csv")
